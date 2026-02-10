@@ -2,8 +2,8 @@ use aes::cipher::{BlockEncryptMut, KeyIvInit};
 use base64::{engine::general_purpose, Engine as _};
 use cbc::Encryptor;
 use des::cipher::{BlockEncrypt, KeyInit};
-use flate2::write::GzEncoder;
 use flate2::Compression;
+use flate2::GzBuilder;
 use md5::{Digest, Md5};
 use rsa::{pkcs8::DecodePublicKey, Pkcs1v15Encrypt, RsaPublicKey};
 use serde_json::Value;
@@ -63,7 +63,6 @@ pub fn get_d_id() -> String {
     des_target.insert("subVersion".to_string(), Value::String("1.0.0".to_string()));
     des_target.insert("time".to_string(), Value::Number(0.into()));
 
-    // 修复：将 BTreeMap 转换为 Value 再传给 get_tn
     let des_target_value = serde_json::to_value(&des_target).unwrap();
     let tn_str = get_tn(&des_target_value);
 
@@ -96,7 +95,7 @@ pub fn get_d_id() -> String {
         .unwrap();
 
     let json: Value = resp.json().unwrap();
-    if json["code"] != 1100 {
+    if json["code"].as_i64().unwrap_or(0) != 1100 {
         panic!("did computation failed: {:?}", json);
     }
 
@@ -184,14 +183,10 @@ fn des_encrypt_dict(o: &BTreeMap<String, Value>) -> BTreeMap<String, Value> {
                 let key = rule.key.as_ref().unwrap();
                 let des = des::Des::new_from_slice(key.as_bytes()).unwrap();
                 let mut data = val_str.into_bytes();
-
-                let padding = 8 - (data.len() % 8);
-                let padding = if padding == 8 { 0 } else { padding };
-
-                let target_len = data.len() + padding;
-                while data.len() < target_len {
-                    data.push(0);
-                }
+                data.extend_from_slice(&[0u8; 8]);
+                let len = data.len();
+                let truncated_len = (len / 8) * 8;
+                data.truncate(truncated_len);
 
                 let mut output = Vec::new();
                 for chunk in data.chunks(8) {
@@ -425,15 +420,18 @@ fn get_des_rules() -> BTreeMap<String, DesRule> {
 
 fn gzip_compress(data: &BTreeMap<String, Value>) -> Vec<u8> {
     let json_str = serde_json::to_string(data).unwrap();
-    let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+    let mut writer = Vec::new();
+    let mut encoder = GzBuilder::new()
+        .mtime(0)
+        .write(&mut writer, Compression::default());
     encoder.write_all(json_str.as_bytes()).unwrap();
-    encoder.finish().unwrap()
+    encoder.finish().unwrap();
+    writer
 }
 
 fn aes_encrypt(data: &[u8], key: &str) -> String {
     let iv = b"0102030405060708";
     let key_bytes = key.as_bytes();
-
     let mut buf = vec![0u8; data.len() + 16];
     buf[..data.len()].copy_from_slice(data);
 
