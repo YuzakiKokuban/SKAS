@@ -1,0 +1,28 @@
+name: Skyland Auto Sign
+
+on:
+  schedule:
+    - cron: '0 1 * * *' 
+  workflow_dispatch:
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Random Delay
+        run: |
+          echo "Sleeping for random time..."
+          sleep $((RANDOM % 3600))
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Sign
+        env:
+          SKYLAND_TOKENS: ${{ secrets.SKYLAND_TOKENS }}
+          ENABLE_ARKNIGHTS: ${{ vars.ENABLE_ARKNIGHTS || 'true' }}
+          ENABLE_ENDFIELD: ${{ vars.ENABLE_ENDFIELD || 'true' }}
+        run: |
+          cargo run --release
