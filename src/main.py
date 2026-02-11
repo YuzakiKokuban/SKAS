@@ -15,18 +15,26 @@ def main():
         sys.exit(1)
         
     all_logs = []
+    global_success = True
     
     for idx, token in enumerate(tokens):
         mask_token = token[:4] + "***" + token[-4:]
         print(f"Processing Account {idx+1}: {mask_token}")
         client = SkylandClient(token)
-        logs = client.run_sign(enable_games)
+        
+        success, logs = client.run_sign(enable_games)
+        if not success:
+            global_success = False
+            
         for log in logs:
             print(log)
         all_logs.extend(logs)
         
     if webhook_url and all_logs:
         send_webhook(webhook_url, "\n".join(all_logs))
+        
+    if not global_success:
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()
