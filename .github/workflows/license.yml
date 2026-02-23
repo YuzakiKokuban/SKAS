@@ -18,7 +18,7 @@ jobs:
 
       - name: Run addlicense
         run: |
-          ~/go/bin/addlicense -v -c "YuzakiKokuban" -l MIT -y 2026 src
+          ~/go/bin/addlicense -v -c "YuzakiKokuban" -s -l GPL-3.0-or-later -y 2026 src
 
       - name: Check for changes
         id: git-check
