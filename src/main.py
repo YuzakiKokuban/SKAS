@@ -1,3 +1,6 @@
+# Copyright 2026 YuzakiKokuban
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import os
 import sys
 from client import SkylandClient
