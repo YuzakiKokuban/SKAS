@@ -12,18 +12,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Set up Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.10'
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          cache-all-crates: true
 
       - name: Run Sign
         env:
           SKYLAND_TOKEN: ${{ secrets.SKYLAND_TOKEN }}
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           ENABLE_GAMES: arknights,endfield
-        run: python src/main.py
+        run: cargo run --release --locked
