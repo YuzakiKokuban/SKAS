@@ -20,5 +20,5 @@ rand = "0.8"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "gzip", "json", "rustls-tls"] }
 rsa = "0.9"
 serde_json = { version = "1.0", features = ["preserve_order"] }
-sha2 = "0.10"
+sha2 = "0.11"
 uuid = { version = "1.18", features = ["v4"] }
