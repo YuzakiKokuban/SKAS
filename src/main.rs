@@ -1,3 +1,6 @@
+// Copyright 2026 YuzakiKokuban
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 mod client;
 mod notifier;
 mod security;

@@ -1,3 +1,6 @@
+// Copyright 2026 YuzakiKokuban
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 use serde_json::{Map, Value};
 
 pub fn md5_hex(data: impl AsRef<[u8]>) -> String {

@@ -1,3 +1,6 @@
+// Copyright 2026 YuzakiKokuban
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
