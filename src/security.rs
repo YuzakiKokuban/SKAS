@@ -10,14 +10,14 @@ use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
 use cbc::Encryptor as CbcEncryptor;
 use chrono::Local;
-use cipher::block_padding::NoPadding;
-use cipher::{BlockEncryptMut, KeyInit, KeyIvInit};
+use ecb::cipher::block_padding::NoPadding;
+use ecb::cipher::{BlockEncryptMut, KeyInit, KeyIvInit};
 use des::TdesEde3;
 use ecb::Encryptor as EcbEncryptor;
 use flate2::Compression;
 use flate2::GzBuilder;
-use rand::thread_rng;
 use reqwest::blocking::Client;
+use rsa::rand_core::OsRng;
 use rsa::{RsaPublicKey, pkcs1v15::Pkcs1v15Encrypt, pkcs8::DecodePublicKey};
 use serde_json::{Map, Number, Value};
 use uuid::Uuid;
@@ -319,7 +319,7 @@ pub fn get_d_id(http: &Client) -> Result<String> {
     let public_key = RsaPublicKey::from_public_key_der(&public_key_der)
         .context("failed to parse RSA public key")?;
     let encrypted_uid = public_key
-        .encrypt(&mut thread_rng(), Pkcs1v15Encrypt, &uid)
+        .encrypt(&mut OsRng, Pkcs1v15Encrypt, &uid)
         .context("failed to encrypt device payload")?;
     let ep = STANDARD.encode(encrypted_uid);
 

@@ -4,6 +4,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result, anyhow};
+use hmac::digest::KeyInit;
 use hmac::{Hmac, Mac};
 use reqwest::Url;
 use reqwest::blocking::Client;
