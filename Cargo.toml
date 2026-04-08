@@ -16,7 +16,7 @@ flate2 = "1.1"
 hex = "0.4"
 hmac = "0.13"
 md5 = "0.8"
-rand = "0.9"
+rand = "0.10"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "gzip", "json", "rustls-tls"] }
 rsa = "0.9"
 serde_json = { version = "1.0", features = ["preserve_order"] }
