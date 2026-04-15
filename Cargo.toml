@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-aes = "0.8"
+aes = "0.9"
 anyhow = "1.0"
 base64 = "0.22"
 cbc = "0.1"
