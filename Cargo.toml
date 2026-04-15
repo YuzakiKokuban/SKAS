@@ -10,7 +10,7 @@ base64 = "0.22"
 cbc = "0.2"
 cipher = "0.5"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
-des = "0.8"
+des = "0.9"
 ecb = "0.2"
 flate2 = "1.1"
 hex = "0.4"
