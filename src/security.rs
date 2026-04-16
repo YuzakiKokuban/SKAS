@@ -11,7 +11,7 @@ use base64::engine::general_purpose::STANDARD;
 use cbc::Encryptor as CbcEncryptor;
 use chrono::Local;
 use ecb::cipher::block_padding::NoPadding;
-use ecb::cipher::{BlockEncryptMut, KeyInit, KeyIvInit};
+use ecb::cipher::{BlockModeEncrypt, KeyInit, KeyIvInit};
 use des::TdesEde3;
 use ecb::Encryptor as EcbEncryptor;
 use flate2::Compression;
@@ -209,7 +209,7 @@ fn triple_des_encrypt_base64(value: &str, key: &str) -> Result<String> {
     let cipher =
         TdesEcbEnc::new_from_slice(&expanded_key).context("failed to build 3DES cipher")?;
     let encrypted = cipher
-        .encrypt_padded_mut::<NoPadding>(&mut data, msg_len)
+        .encrypt_padded::<NoPadding>(&mut data, msg_len)
         .map_err(|_| anyhow!("failed to encrypt 3DES payload"))?;
     Ok(STANDARD.encode(encrypted))
 }
@@ -225,7 +225,7 @@ fn aes_encrypt_hex(value: &[u8], key: &[u8]) -> Result<String> {
     let iv = b"0102030405060708";
     let cipher = AesCbcEnc::new_from_slices(key, iv).context("failed to build AES cipher")?;
     let encrypted = cipher
-        .encrypt_padded_mut::<NoPadding>(&mut data, msg_len)
+        .encrypt_padded::<NoPadding>(&mut data, msg_len)
         .map_err(|_| anyhow!("failed to encrypt AES payload"))?;
     Ok(hex::encode(encrypted))
 }
