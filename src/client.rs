@@ -162,7 +162,7 @@ impl SkylandClient {
         (all_success, logs)
     }
 
-    fn login(&mut self) -> Result<()> {
+    pub fn login(&mut self) -> Result<()> {
         let grant_body = object_from_pairs([
             ("appCode", Value::String(APP_CODE.to_string())),
             ("token", Value::String(self.token.clone())),
@@ -230,6 +230,12 @@ impl SkylandClient {
             .get("token")
             .and_then(Value::as_str)
             .map(ToString::to_string);
+
+        if self.cred.as_deref().is_none_or(str::is_empty)
+            || self.cred_token.as_deref().is_none_or(str::is_empty)
+        {
+            return Err(anyhow!("missing signin credentials"));
+        }
 
         Ok(())
     }

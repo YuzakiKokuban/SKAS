@@ -64,18 +64,28 @@ SKAS 是一个针对森空岛（Skyland）平台的轻量级自动化签到工�
 
 推荐将本仓库 Fork 后通过 GitHub Actions 定时执行。
 
-1. 在仓库 `Settings -> Secrets and variables -> Actions` 中配置：
+### 在本机导出并加密 Token
 
-   | Secret 名称 | 必须 | 说明 |
-   | :--- | :--- | :--- |
-   | `SKYLAND_TOKEN` | 是 | 鹰角网络通行证 Token，多账号用逗号分隔。 |
-   | `WEBHOOK_URL` | 否 | 结果通知地址。 |
+需要 Python 3.10+ 和 Rust 工具链。在仓库根目录运行以下命令（Linux/macOS 可将 `python` 换成 `python3`）。
 
-2. 在 Workflow 中直接执行：
+```bash
+python -m pip install cryptography==50.0.2 playwright==1.64.1
+python scripts/skyland_token.py generate-key
+```
 
-   ```bash
-   cargo run --release
-   ```
+将最后一条命令生成的密钥保存到密码管理器，并在仓库的 `Settings → Secrets and variables → Actions` 中设为 `SKYLAND_TOKEN_KEY`。可选的 `WEBHOOK_URL` 仍用于签到通知。
+
+```bash
+python scripts/skyland_token.py export
+```
+
+Windows 默认使用已安装的 Edge。Linux/macOS 默认使用 Chromium，先运行 `python -m playwright install chromium`。也可以用 `export --browser chrome` 选择已安装的 Chrome。
+
+按提示输入同一把密钥，在脚本打开的浏览器中登录森空岛，再回到终端按 Enter。脚本使用该会话访问 [森空岛凭证接口](https://web-api.skland.com/account/info/hg)，确认能换取签到凭证后才写入 `skyland-token.enc`。多个账号使用 `export --accounts N` 依次登录。每次导出会替换整份账号列表。
+
+确认后提交并推送 `skyland-token.enc`，然后在 Actions 手动运行一次 `SKAS Auto Sign`。工作流有加密文件时使用 `SKYLAND_TOKEN_KEY` 解密，没有加密文件时读取原有的 `SKYLAND_TOKEN`。新流程跑通后即可删除旧 Secret。
+
+Token 过期后，重新运行 `export` 并推送更新后的文件即可。密钥只保存在本机的密码管理器和 Actions Secret 中。Git 历史会保留旧密文，因此密钥泄露后需要更换密钥并使受影响的旧登录凭证失效。
 
 ## 代码结构
 

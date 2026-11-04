@@ -28,6 +28,19 @@ fn main() {
         process::exit(1);
     }
 
+    if env::args().nth(1).as_deref() == Some("--validate-token") {
+        for (index, token) in tokens.into_iter().enumerate() {
+            if SkylandClient::new(token)
+                .and_then(|mut client| client.login())
+                .is_err()
+            {
+                eprintln!("Could not validate account {}.", index + 1);
+                process::exit(1);
+            }
+        }
+        return;
+    }
+
     let enable_games = env::var("ENABLE_GAMES")
         .unwrap_or_else(|_| "arknights,endfield".to_string())
         .split(',')

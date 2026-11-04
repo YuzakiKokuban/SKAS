@@ -20,9 +20,15 @@ jobs:
         with:
           cache-all-crates: true
 
+      - name: Install token helper dependencies
+        run: |
+          python3 -m venv "$RUNNER_TEMP/skas"
+          "$RUNNER_TEMP/skas/bin/python" -m pip install cryptography==50.0.2
+
       - name: Run Sign
         env:
           SKYLAND_TOKEN: ${{ secrets.SKYLAND_TOKEN }}
+          SKYLAND_TOKEN_KEY: ${{ secrets.SKYLAND_TOKEN_KEY }}
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
           ENABLE_GAMES: arknights,endfield
-        run: cargo run --release --locked
+        run: '"$RUNNER_TEMP/skas/bin/python" scripts/skyland_token.py run'
